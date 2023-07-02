@@ -49,7 +49,27 @@ function App() {
 function SignIn() {
   const SignInWithGoogle = () => {
     const provider = new GoogleAuthProvider();
-    auth.signInWithPopup(provider);
+    // auth.signInWithPopup(provider);
+    signInWithPopup(auth, provider)
+  .then((result) => {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential.accessToken;
+    // The signed-in user info.
+    const user = result.user;
+    // IdP data available using getAdditionalUserInfo(result)
+    // ...
+  }).catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData.email;
+    // The AuthCredential type that was used.
+    const credential = GoogleAuthProvider.credentialFromError(error);
+    // ...
+  });
+
     signInWithRedirect(auth, provider);
   }
   return (
@@ -74,13 +94,24 @@ function ChatRoom(){
       <div>
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
       </div>
+      <form>
+        <input type="text" />
+        <button type='submit'></button>
+      </form>
     </>
   )
 }
 
 function ChatMessage(props){
-  const { text, uid} = props.message;
-  return <p> {text} </p>
+  const { text, uid, photoURL} = props.message;
+  const messageClass = (uid === auth.currentUser.uid)? 'sent':'received';
+
+  return (
+    <div className={`message ${messageClass}`} >
+      <img src={photoURL} alt="" />
+      <p> {text} </p>
+    </div>
+  )
 }
 
 export default App;
