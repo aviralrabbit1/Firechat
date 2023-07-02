@@ -1,11 +1,13 @@
 import './App.css';
 import firebase from 'firebase/compat/app';
-import 'firebase/firestore';
-import 'firebase/auth';
+import "https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js";
+import { firestore } from "https://www.gstatic.com/firebasejs/7.19.0/firebase-firestore.js";
+import { getFirestore, collection } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+// import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
 
 
 // Web app's Firebase configuration
@@ -19,8 +21,16 @@ const firebaseConfig = {
   measurementId: "G-36N8PHSEQ6"
 };
 // initializing the app
-const analytics = getAnalytics(initializeApp(firebaseConfig));
-firebase.initializeApp({firebaseConfig});
+const app = firebase.initializeApp(firebaseConfig);
+// const analytics = getAnalytics(app);
+
+// Initialize Firebase Authentication and get a reference to the service
+const auth = getAuth(app);
+
+// Initialize Cloud Firestore and get a reference to the service
+const db = getFirestore(app);
+
+// firebase.initializeApp({firebaseConfig});
 
 function App() {
   const [user] = useAuthState(auth);
@@ -38,8 +48,9 @@ function App() {
 
 function SignIn() {
   const SignInWithGoogle = () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
     auth.signInWithPopup(provider);
+    signInWithRedirect(auth, provider);
   }
   return (
     <button onClick={SignInWithGoogle}>Sign In With Google</button>
@@ -57,6 +68,19 @@ function ChatRoom(){
   const query = messsageRef.orderBy('createdAt').limit(25);
 
   const [messages] = useCollectionData(query, {idField: 'id'});
+
+  return(
+    <>
+      <div>
+        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+      </div>
+    </>
+  )
+}
+
+function ChatMessage(props){
+  const { text, uid} = props.message;
+  return <p> {text} </p>
 }
 
 export default App;
