@@ -25,13 +25,23 @@ const analytics = getAnalytics(initializeApp(firebaseConfig));
 firebase.initializeApp({firebaseConfig});
 
 function App() {
+  const [user] = useAuthState(auth);
   return (
     <div className="App">
       <header className="App-header">
         Firechat app
       </header>
+      <section>
+        {user ? <ChatRoom/>: <SignIn/> }
+      </section>
     </div>
   );
+}
+
+function SignIn() {
+  return (
+    <button onClick={SignInWithGoogle}>Sign In With Google</button>
+  )  
 }
 
 export default App;
