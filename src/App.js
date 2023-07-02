@@ -1,11 +1,9 @@
-import logo from './logo.svg';
 import './App.css';
 import firebase from 'firebase/compat/app';
 import 'firebase/firestore';
 import 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-// import { initializeApp } from "firebase/app";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
 
@@ -39,9 +37,26 @@ function App() {
 }
 
 function SignIn() {
+  const SignInWithGoogle = () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
+  }
   return (
     <button onClick={SignInWithGoogle}>Sign In With Google</button>
   )  
+}
+
+function SignOut() {
+  return auth.currentUser && (
+    <button onClick={()=> auth.SignOut()}>Sign Out</button>
+  )  
+}
+
+function ChatRoom(){
+  const messsageRef = firestore.collection('messages');
+  const query = messsageRef.orderBy('createdAt').limit(25);
+
+  const [messages] = useCollectionData(query, {idField: 'id'});
 }
 
 export default App;
